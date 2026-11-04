@@ -130,6 +130,17 @@ export XDG_RUNTIME_DIR=/tmp/pnpm-run && mkdir -p "$XDG_RUNTIME_DIR"
    并接进 `dev` / `build` / `build:cf` 脚本，保证构建产物永远是最新的。
 7. **`src/app/rss.xml/route.ts`** 的站点域名回退值改为 `https://murin.dpdns.org`。
 8. 去掉了自定义光标（`layout.tsx` 里的 `cursor: url(/images/cursor.svg)`），该素材已删。
+9. **清除了上游硬编码的第三方依赖**（它们要么把访客数据发给作者，要么依赖作者随时可能关停的服务器）：
+   - `src/layout/head.tsx` 里作者的 Google Analytics（`G-ZNSFR7C9PM`）——已整段删除（线上实测确认它在加载）；
+   - `src/components/like-button.tsx` 里作者的点赞服务（`blog-liker.yysuni1001.workers.dev`）——
+     改为读 `NEXT_PUBLIC_LIKE_API_ENDPOINT`，**未配置时整个按钮不渲染、不发任何请求**
+     （原来首页显示的是作者的点赞数）；`card-styles.json` 的 `likePosition` 已关闭；
+   - Google Fonts 外链（`fonts.googleapis.cn`）——Averia Gruesa Libre 改为自托管
+     （`public/fonts/*.woff2` + `src/styles/theme.css` 的 `@font-face`），不再有外部字体请求；
+   - `src/app/blog/page.tsx` 底部指向作者掘金主页的「更多」按钮——已移除。
+10. 删除作者的游戏页 `src/app/wuthering-waves/`（引用 `mc.kurogames.com`，属作者个人内容）。
+11. `sitemap.ts` 与 `rss.xml/route.ts` 统一了域名优先级：`SITE_URL` → `NEXT_PUBLIC_SITE_URL` →
+    Vercel 生产环境用 `https://murin.dpdns.org` → 预览用 `VERCEL_URL`。**因此在 Vercel 上不需要设任何环境变量。**
 
 ## 已知限制与坑
 
