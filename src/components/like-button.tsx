@@ -5,7 +5,7 @@ import { Heart } from 'lucide-react'
 import clsx from 'clsx'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
-import { BLOG_SLUG_KEY } from '@/consts'
+import { BLOG_SLUG_KEY, LIKE_API_ENDPOINT } from '@/consts'
 
 type LikeButtonProps = {
 	slug?: string
@@ -13,9 +13,10 @@ type LikeButtonProps = {
 	delay?: number
 }
 
-const ENDPOINT = 'https://blog-liker.yysuni1001.workers.dev/api/like'
+// 上游这里硬编码了作者的点赞服务；改为可配置，未配置时按钮整块不渲染（见 consts.ts）
+const ENDPOINT = LIKE_API_ENDPOINT
 
-export default function LikeButton({ slug = 'yysuni', delay, className }: LikeButtonProps) {
+export default function LikeButton({ slug = '', delay, className }: LikeButtonProps) {
 	slug = BLOG_SLUG_KEY + slug
 	const [liked, setLiked] = useState(false)
 	const [show, setShow] = useState(false)
@@ -42,7 +43,7 @@ export default function LikeButton({ slug = 'yysuni', delay, className }: LikeBu
 		return typeof data?.count === 'number' ? data.count : null
 	}, [])
 
-	const { data: fetchedCount, mutate } = useSWR(slug ? `${ENDPOINT}?slug=${encodeURIComponent(slug)}` : null, fetcher, {
+	const { data: fetchedCount, mutate } = useSWR(slug && ENDPOINT ? `${ENDPOINT}?slug=${encodeURIComponent(slug)}` : null, fetcher, {
 		revalidateOnFocus: false,
 		dedupingInterval: 1000 * 10
 	})
@@ -76,6 +77,9 @@ export default function LikeButton({ slug = 'yysuni', delay, className }: LikeBu
 	}, [slug, fetchedCount, mutate])
 
 	const count = typeof fetchedCount === 'number' ? fetchedCount : null
+
+	// 没有配置点赞服务就什么都不渲染（不发任何外部请求）
+	if (!ENDPOINT) return null
 
 	if (show)
 		return (
