@@ -141,7 +141,10 @@ export XDG_RUNTIME_DIR=/tmp/pnpm-run && mkdir -p "$XDG_RUNTIME_DIR"
 3. `config.json` 与 `index.json` 是**生成物**。直接改它们会在下次 `build`/`dev` 时被覆盖。
 4. **空页面**：`我的项目`（`/projects`）、`推荐分享`（`/share`）、`优秀博客`（`/bloggers`）
    的列表已清空，现在是空状态。想填就编辑对应的 `list.json`。
-5. `public/blogs/index.json` 会被 `sitemap.ts` 和 `rss.xml/route.ts` 在**构建期直接 import**，
+5. **用生产构建预览时，往 `public/` 新增的文件要重新构建才会被服务。**
+   Next.js 的静态文件清单是构建期生成的，`next start` 不会自动发现新文件——实测新加的图片会 404，
+   重新 `pnpm build` 并重启后才变 200。线上不受影响（每次 push 都会重新构建）。
+6. `public/blogs/index.json` 会被 `sitemap.ts` 和 `rss.xml/route.ts` 在**构建期直接 import**，
    所以这个文件必须存在，否则构建会失败（`Module not found: Can't resolve '@/../public/blogs/index.json'`）。
    `pnpm build` 会先跑同步脚本生成它；全新克隆后想手动构建，先跑一次 `pnpm sync`。
 
