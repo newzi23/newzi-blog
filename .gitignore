@@ -55,3 +55,7 @@ next-env.d.ts
 # 这是本站正文图片链接能否正确的关键，不该让人手动去点。
 /public/.obsidian/*
 !/public/.obsidian/app.json
+
+# 误建的嵌套 Obsidian vault（2026-11-04 在仓库目录里新建了一个叫 newzi-blog 的空 vault）。
+# 正确的 vault 根目录是 public/，见 README。这里挡一道，避免再被误提交。
+/newzi-blog/
