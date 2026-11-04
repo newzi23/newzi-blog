@@ -1,0 +1,5 @@
+{
+	"title": "关于本站",
+	"description": "newzi 的个人博客",
+	"content": "这个博客用来记录折腾过程、技术笔记和自建服务。\n\n内容全部以 Markdown 存在 GitHub 仓库里，版本可控、随时可回滚，没有任何后端和数据库。\n\n## 关于我\n\n- GitHub：[@newzi23](https://github.com/newzi23)\n- 主力环境：Arch Linux + niri\n\n## 技术栈\n\n- Next.js 16 + React + TypeScript\n- Tailwind CSS\n- GitHub 作为唯一数据源\n- Vercel 部署\n\n## 写作方式\n\n本地用 Obsidian 写 Markdown，通过 git 推送到仓库，平台自动重新构建。"
+}

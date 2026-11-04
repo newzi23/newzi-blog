@@ -1,0 +1,14 @@
+{
+  "title": "把 OpenList 跑在 Cloudflare Workers 上：一次真实的部署与运维记录",
+  "date": "2026-11-04T22:08",
+  "tags": [
+    "OpenList",
+    "Cloudflare Workers",
+    "Serverless",
+    "自建网盘"
+  ],
+  "category": "自建服务",
+  "summary": "把 OpenList 部署到 Cloudflare Workers 的完整记录：为什么选它、架构长什么样、没有 Git 构建连接时怎么手工部署、KV 绑定和 JWT_SECRET 上的坑、免费额度的真实约束，以及一套能落地的巡检与备份办法。",
+  "cover": "/blogs/openlist-on-cloudflare-workers/cover.webp",
+  "hidden": false
+}

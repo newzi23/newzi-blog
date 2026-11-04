@@ -1,0 +1,13 @@
+#!/bin/sh
+# 提交前把 index.md 的 frontmatter 同步成 config.json 与总索引 index.json，
+# 并把生成结果加入本次提交，保证仓库里的 JSON 不会落后于 Markdown。
+#
+# 启用方式：bash scripts/install-hooks.sh
+#
+# 注意：Obsidian 的 obsidian-git 插件在部分配置下使用 isomorphic-git，不执行 git hooks。
+# 那种情况下仓库里的 JSON 可能滞后——不影响构建（build 前会自动同步），只是仓库内容不够整洁。
+if command -v node >/dev/null 2>&1; then
+  node scripts/blog-sync.mjs >/dev/null 2>&1 || true
+  git add public/blogs >/dev/null 2>&1 || true
+fi
+exit 0

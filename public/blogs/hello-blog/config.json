@@ -1,0 +1,13 @@
+{
+  "title": "博客开张：Hexo + Butterfly + GitHub Pages",
+  "date": "2026-11-04T21:10",
+  "tags": [
+    "Hexo",
+    "Butterfly",
+    "GitHub Pages"
+  ],
+  "category": "建站",
+  "summary": "记录这个博客的搭建方式：Hexo 生成静态站点，Butterfly 主题，源码放在 GitHub 的 hexo-blog 仓库，发布到 GitHub Pages。",
+  "cover": "/blogs/hello-blog/cover.webp",
+  "hidden": false
+}
