@@ -5,11 +5,18 @@ import type { BlogIndexItem } from '@/app/blog/types'
 export const dynamic = 'force-static'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-	// 域名配置：
-	// 1. 优先使用 SITE_URL (你在 Vercel 手动设置的正式域名)
-	// 2. 其次尝试 VERCEL_URL (Vercel 自动生成的预览域名，通常不带 https://)
-	// 3. 最后回退到本地开发地址
-	const baseUrl = process.env.SITE_URL ? process.env.SITE_URL : process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'
+	// 域名优先级：
+	// 1. SITE_URL / NEXT_PUBLIC_SITE_URL —— 想手动指定时用
+	// 2. Vercel 生产环境 —— 直接用正式域名，所以正式站不需要设任何环境变量
+	// 3. 预览/本地 —— 用 VERCEL_URL / localhost
+	const baseUrl =
+		process.env.SITE_URL ||
+		process.env.NEXT_PUBLIC_SITE_URL ||
+		(process.env.VERCEL_ENV === 'production'
+			? 'https://murin.dpdns.org'
+			: process.env.VERCEL_URL
+				? `https://${process.env.VERCEL_URL}`
+				: 'http://localhost:3000')
 
 	console.log(`[Sitemap] Generating for: ${baseUrl}`)
 

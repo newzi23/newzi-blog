@@ -5,7 +5,15 @@ import siteContent from '@/config/site-content.json'
 import blogIndex from '@/../public/blogs/index.json'
 import type { BlogIndexItem } from '@/app/blog/types'
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://murin.dpdns.org'
+// 与 sitemap.ts 保持同一套优先级（生产环境不需要设环境变量）
+const SITE_URL =
+	process.env.SITE_URL ||
+	process.env.NEXT_PUBLIC_SITE_URL ||
+	(process.env.VERCEL_ENV === 'production'
+		? 'https://murin.dpdns.org'
+		: process.env.VERCEL_URL
+			? `https://${process.env.VERCEL_URL}`
+			: 'http://localhost:3000')
 const FEED_PATH = '/rss.xml'
 const SITE_ORIGIN = SITE_URL.replace(/\/$/, '')
 const FEED_URL = `${SITE_ORIGIN}${FEED_PATH}`

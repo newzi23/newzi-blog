@@ -107,9 +107,8 @@ export XDG_RUNTIME_DIR=/tmp/pnpm-run && mkdir -p "$XDG_RUNTIME_DIR"
 
 1. Vercel → Add New → Project → 导入本仓库。
 2. Framework 会自动识别为 Next.js，**不需要改任何构建配置**，直接 Deploy。
-3. 绑定自定义域名后，在项目环境变量里加 `SITE_URL=https://你的域名`
-   （`sitemap.xml` 用它拼绝对地址；`rss.xml` 用 `NEXT_PUBLIC_SITE_URL`，两个都设最稳）。
-   不设也能跑，`sitemap.xml` 会回退到 `VERCEL_URL`。
+3. **不需要设任何环境变量**：`sitemap.xml` 与 `rss.xml` 在 Vercel 生产环境会自动使用
+   `https://murin.dpdns.org`。只有在你想换域名时才需要设 `SITE_URL`（预览部署仍会用 `VERCEL_URL`）。
 
 每次 push 到 `main` 都会自动重新部署。
 
