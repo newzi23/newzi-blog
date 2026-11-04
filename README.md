@@ -38,11 +38,11 @@ Next.js 16 (App Router) + React + TypeScript + Tailwind
 2. **Obsidian 打开 vault 时，选 `public/` 这个子目录，不要选仓库根目录。**
    原因：Obsidian 的「绝对路径」链接是相对 vault 根的，vault 开在 `public/` 时生成的链接正好是
    `/blogs/<slug>/x.png`，与站点要求的格式一致；开在仓库根目录会变成 `/public/blogs/...`，全站图片失效。
-3. Obsidian → 设置 → 文件与链接：
-   - `使用 [[Wikilinks]]` → **关闭**
-   - `新链接格式` → **绝对路径**
-   - `新附件的默认位置` → **当前文件所在文件夹**
+3. 文件与链接的三个关键设置**已经提交在 `public/.obsidian/app.json` 里**（Markdown 链接、
+   绝对路径、附件放当前文件所在文件夹），打开 vault 就自动生效，不用手点。
+   若发现图片链接变成了短链（`xxx.png` 而不是 `/blogs/...`），就是这三项被覆盖了，去设置里改回来。
 4. 安装社区插件 **obsidian-git**（自动 commit + push），按需开启定时拉取/推送。
+   （插件本体没法预先提交，需要在 Obsidian 的社区插件市场里装一次。）
 5. （可选但推荐）在仓库里执行 `bash scripts/install-hooks.sh`，启用提交前自动同步。
 
 ### 写一篇新文章
@@ -98,6 +98,12 @@ export XDG_RUNTIME_DIR=/tmp/pnpm-run && mkdir -p "$XDG_RUNTIME_DIR"
 ```
 
 ## 部署（Vercel）
+
+一键导入（以本仓库为源，登录后直接点 Deploy）：
+
+<https://vercel.com/new/clone?repository-url=https://github.com/newzi23/newzi-blog>
+
+手动步骤：
 
 1. Vercel → Add New → Project → 导入本仓库。
 2. Framework 会自动识别为 Next.js，**不需要改任何构建配置**，直接 Deploy。

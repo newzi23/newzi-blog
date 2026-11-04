@@ -51,4 +51,7 @@ next-env.d.ts
 /.pnpm-state/
 
 # Obsidian vault 的本地配置（vault 根目录 = public/）
-/public/.obsidian/
+# 但 app.json 要提交：它锁定了「Markdown 链接 + 绝对路径 + 附件放当前目录」，
+# 这是本站正文图片链接能否正确的关键，不该让人手动去点。
+/public/.obsidian/*
+!/public/.obsidian/app.json
