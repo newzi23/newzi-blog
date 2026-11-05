@@ -48,6 +48,7 @@ Next.js 16 (App Router) + React + TypeScript + Tailwind
 ### 写一篇新文章
 
 1. 在 `public/blogs/` 下新建一个目录，目录名就是 URL 里的 slug，例如 `arch-niri-setup`。
+   （`public/blogs/_新文章模板.md` 是一份可直接复制的模板，包含 frontmatter 骨架。）
 2. 在里面新建 `index.md`，开头写 frontmatter：
 
 ```markdown
