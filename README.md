@@ -142,6 +142,19 @@ export XDG_RUNTIME_DIR=/tmp/pnpm-run && mkdir -p "$XDG_RUNTIME_DIR"
 10. 删除作者的游戏页 `src/app/wuthering-waves/`（引用 `mc.kurogames.com`，属作者个人内容）。
 11. `sitemap.ts` 与 `rss.xml/route.ts` 统一了域名优先级：`SITE_URL` → `NEXT_PUBLIC_SITE_URL` →
     Vercel 生产环境用 `https://murin.dpdns.org` → 预览用 `VERCEL_URL`。**因此在 Vercel 上不需要设任何环境变量。**
+    该逻辑已抽到 `src/lib/site-url.ts` 的 `getSiteUrl()` / `absoluteUrl()`，sitemap、RSS、Open Graph 共用。
+12. **新增自定义 404**（`src/app/not-found.tsx`）：上游用的是 Next 默认页（英文、无样式）。
+    ⚠️ 站点 `card` 工具类自带 `absolute`，用它的地方必须显式加 `relative`/`static`，
+    否则元素会全部叠在一起（这个坑踩过一次）。
+13. **补齐 Open Graph 分享卡片**：
+    - `layout.tsx` 加 `metadataBase`、标题模板（`%s | 站名`）、`og:image`、`twitter:card`、
+      `alternates.types` 指向 `/rss.xml`；新增默认分享图 `public/og-default.png`（1200×630）。
+    - **文章页拆成「服务端壳 + 客户端组件」**：`blog/[id]/page.tsx` 原本整个是 `'use client'`，
+      而客户端组件不能导出 `metadata`，导致每篇文章分享出去只有站点级标题、没有文章标题和封面。
+      现在 `page.tsx` 用构建期导入的 `blogs/index.json` 生成每篇独立的
+      `title/description/canonical/og:image(该篇封面)`，原客户端代码原样移到 `blog-client.tsx`。
+14. **RSS 入口**：首页社交按钮加了一项（`type: "link"`，值 `/rss.xml`），并在 head 里加了
+    `rel="alternate" type="application/rss+xml"` 供阅读器自动发现。
 
 ## 已知限制与坑
 
