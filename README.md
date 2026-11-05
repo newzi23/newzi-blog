@@ -155,7 +155,16 @@ export XDG_RUNTIME_DIR=/tmp/pnpm-run && mkdir -p "$XDG_RUNTIME_DIR"
 5. **用生产构建预览时，往 `public/` 新增的文件要重新构建才会被服务。**
    Next.js 的静态文件清单是构建期生成的，`next start` 不会自动发现新文件——实测新加的图片会 404，
    重新 `pnpm build` 并重启后才变 200。线上不受影响（每次 push 都会重新构建）。
-6. `public/blogs/index.json` 会被 `sitemap.ts` 和 `rss.xml/route.ts` 在**构建期直接 import**，
+6. **全站图片一律用普通 `<img>`，不要改回 `next/image`。**
+   实测：导航头像原本是项目里唯一使用 `next/image` 的地方，本地 `next start` 正常，
+   但 Vercel 上线后显示为**空白圆圈**（服务端 `/_next/image` 端点各宽度都返回 200、
+   图片内容也验证正确，浏览器就是不显示）。改用普通 `<img>` 后恢复正常。
+   同时头像文件已从 512×512 PNG（110KB）压到 256×256 调色板 PNG（11KB）。
+7. **文章正文是客户端渲染 + 动态加载 shiki，首屏会先显示「加载中」。**
+   实测（从国内经代理访问 Vercel）：文章页 HTML ~1.4s、正文 md ~2.0s，首屏还要拉约 310KB 的
+   JS chunk，每个请求 1.4–2.5s，所以文章页第一屏可能要等十秒上下。这是上游架构的固有特征
+   （`loadBlog` 运行时 fetch + `renderMarkdown` 动态 import shiki），不是配置问题。
+8. `public/blogs/index.json` 会被 `sitemap.ts` 和 `rss.xml/route.ts` 在**构建期直接 import**，
    所以这个文件必须存在，否则构建会失败（`Module not found: Can't resolve '@/../public/blogs/index.json'`）。
    `pnpm build` 会先跑同步脚本生成它；全新克隆后想手动构建，先跑一次 `pnpm sync`。
 
