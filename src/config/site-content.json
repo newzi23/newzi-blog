@@ -35,6 +35,13 @@
 			"value": "https://github.com/newzi23",
 			"label": "Github",
 			"order": 1
+		},
+		{
+			"id": "rss",
+			"type": "link",
+			"value": "/rss.xml",
+			"label": "RSS",
+			"order": 2
 		}
 	],
 	"clockShowSeconds": false,

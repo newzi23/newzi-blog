@@ -1,101 +1,61 @@
-'use client'
+import type { Metadata } from 'next'
+import blogIndex from '@/../public/blogs/index.json'
+import type { BlogIndexItem } from '@/app/blog/types'
+import { absoluteUrl, getSiteUrl } from '@/lib/site-url'
+import BlogClient from './blog-client'
 
-import { useEffect, useMemo, useState } from 'react'
-import { useParams, useRouter } from 'next/navigation'
-import dayjs from 'dayjs'
-import { motion } from 'motion/react'
-import { BlogPreview } from '@/components/blog-preview'
-import { loadBlog, type BlogConfig } from '@/lib/load-blog'
-import { useReadArticles } from '@/hooks/use-read-articles'
-import LiquidGrass from '@/components/liquid-grass'
-import { useConfigStore } from '@/app/(home)/stores/config-store'
+/**
+ * 文章详情页拆成「服务端壳 + 客户端组件」两层。
+ *
+ * 原因：页面内容需要在浏览器里渲染（运行时 fetch markdown + 动态加载 shiki），原本整个
+ * page.tsx 是 'use client'，而客户端组件**不能导出 metadata** —— 结果每篇文章分享出去
+ * 都只有站点级的标题/描述，看不到文章标题和封面。
+ *
+ * 现在由这一层（服务端）用构建期导入的索引生成每篇独立的 title / description / og:image，
+ * 渲染仍交给原来的客户端组件，行为完全不变。
+ */
+const posts = blogIndex as BlogIndexItem[]
+
+function findPost(slug: string): BlogIndexItem | undefined {
+	const decoded = decodeURIComponent(slug)
+	return posts.find(p => p.slug === decoded)
+}
+
+type PageProps = { params: Promise<{ id: string }> }
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+	const { id } = await params
+	const post = findPost(id)
+
+	if (!post) {
+		return { title: '文章不存在' }
+	}
+
+	const url = `${getSiteUrl()}/blog/${post.slug}`
+	const image = absoluteUrl(post.cover) || absoluteUrl('/og-default.png')
+	const description = post.summary || post.title
+
+	return {
+		title: post.title,
+		description,
+		alternates: { canonical: url },
+		openGraph: {
+			type: 'article',
+			title: post.title,
+			description,
+			url,
+			images: image ? [{ url: image, width: 1200, height: 630, alt: post.title }] : undefined,
+			tags: post.tags
+		},
+		twitter: {
+			card: 'summary_large_image',
+			title: post.title,
+			description,
+			images: image ? [image] : undefined
+		}
+	}
+}
 
 export default function Page() {
-	const params = useParams() as { id?: string | string[] }
-	const slug = Array.isArray(params?.id) ? params.id[0] : params?.id || ''
-	const router = useRouter()
-	const { markAsRead } = useReadArticles()
-	// 本站走 Obsidian 写作，网页编辑器整个隐藏（site-content.json 的 hideEditButton）
-	const hideEditButton = useConfigStore(s => s.siteContent.hideEditButton ?? false)
-
-	const [blog, setBlog] = useState<{ config: BlogConfig; markdown: string; cover?: string } | null>(null)
-	const [error, setError] = useState<string | null>(null)
-	const [loading, setLoading] = useState<boolean>(true)
-
-	useEffect(() => {
-		let cancelled = false
-		async function run() {
-			if (!slug) return
-			try {
-				setLoading(true)
-				const blogData = await loadBlog(slug)
-
-				if (!cancelled) {
-					setBlog(blogData)
-					setError(null)
-					markAsRead(slug)
-				}
-			} catch (e: any) {
-				if (!cancelled) setError(e?.message || '加载失败')
-			} finally {
-				if (!cancelled) setLoading(false)
-			}
-		}
-		run()
-		return () => {
-			cancelled = true
-		}
-	}, [slug, markAsRead])
-
-	const title = useMemo(() => (blog?.config.title ? blog.config.title : slug), [blog?.config.title, slug])
-	const date = useMemo(() => dayjs(blog?.config.date).format('YYYY年 M月 D日'), [blog?.config.date])
-	const tags = blog?.config.tags || []
-
-	const handleEdit = () => {
-		router.push(`/write/${slug}`)
-	}
-
-	if (!slug) {
-		return <div className='text-secondary flex h-full items-center justify-center text-sm'>无效的链接</div>
-	}
-
-	if (loading) {
-		return <div className='text-secondary flex h-full items-center justify-center text-sm'>加载中...</div>
-	}
-
-	if (error) {
-		return <div className='flex h-full items-center justify-center text-sm text-red-500'>{error}</div>
-	}
-
-	if (!blog) {
-		return <div className='text-secondary flex h-full items-center justify-center text-sm'>文章不存在</div>
-	}
-
-	return (
-		<>
-			<BlogPreview
-				markdown={blog.markdown}
-				title={title}
-				tags={tags}
-				date={date}
-				summary={blog.config.summary}
-				cover={blog.cover ? (blog.cover.startsWith('http') ? blog.cover : `${origin}${blog.cover}`) : undefined}
-				slug={slug}
-			/>
-
-			{!hideEditButton && (
-				<motion.button
-					initial={{ opacity: 0, scale: 0.6 }}
-					animate={{ opacity: 1, scale: 1 }}
-					whileHover={{ scale: 1.05 }}
-					whileTap={{ scale: 0.95 }}
-					onClick={handleEdit}
-					className='absolute top-4 right-6 rounded-xl border bg-white/60 px-6 py-2 text-sm backdrop-blur-sm transition-colors hover:bg-white/80 max-sm:hidden'>
-					编辑
-				</motion.button>
-			)}
-
-			{slug === 'liquid-grass' && <LiquidGrass />}
-		</>
-	)
+	return <BlogClient />
 }

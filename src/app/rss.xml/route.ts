@@ -4,16 +4,10 @@ import path from 'node:path'
 import siteContent from '@/config/site-content.json'
 import blogIndex from '@/../public/blogs/index.json'
 import type { BlogIndexItem } from '@/app/blog/types'
+import { getSiteUrl } from '@/lib/site-url'
 
-// 与 sitemap.ts 保持同一套优先级（生产环境不需要设环境变量）
-const SITE_URL =
-	process.env.SITE_URL ||
-	process.env.NEXT_PUBLIC_SITE_URL ||
-	(process.env.VERCEL_ENV === 'production'
-		? 'https://murin.dpdns.org'
-		: process.env.VERCEL_URL
-			? `https://${process.env.VERCEL_URL}`
-			: 'http://localhost:3000')
+// 与 sitemap.ts / Open Graph 共用同一套优先级（生产环境不需要设环境变量）
+const SITE_URL = getSiteUrl()
 const FEED_PATH = '/rss.xml'
 const SITE_ORIGIN = SITE_URL.replace(/\/$/, '')
 const FEED_URL = `${SITE_ORIGIN}${FEED_PATH}`
