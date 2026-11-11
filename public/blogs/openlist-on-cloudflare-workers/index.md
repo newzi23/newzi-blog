@@ -1,5 +1,8 @@
 ---
 title: 把 OpenList 跑在 Cloudflare Workers 上：一次真实的部署与运维记录
+aliases:
+  - OpenList 部署
+  - 把 OpenList 跑在 Cloudflare Workers 上
 date: 2026-11-04T22:08
 tags:
   - OpenList

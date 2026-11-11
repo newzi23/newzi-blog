@@ -20,6 +20,9 @@ const INDEX_FILE = path.join(BLOGS_DIR, 'index.json')
 
 const LIST_KEYS = new Set(['tags'])
 
+/** 只给 Obsidian 用的字段，不要写进 config.json */
+const SKIP_KEYS = new Set(['aliases'])
+
 /** 去掉值两侧的引号 */
 function unquote(v) {
   const s = v.trim()
@@ -121,6 +124,7 @@ function main() {
       const { data } = parsed
       // frontmatter 覆盖 config.json；未写的字段沿用 config.json
       for (const [k, v] of Object.entries(data)) {
+        if (SKIP_KEYS.has(k)) continue
         config[k] = v
       }
     }
@@ -159,6 +163,31 @@ function main() {
   if (prevIndex !== nextIndex) {
     fs.writeFileSync(INDEX_FILE, nextIndex)
     console.log(`[blog-sync] 更新 index.json（${index.length} 篇）`)
+  }
+
+  // ---- 生成 Obsidian 用的文章索引 ----
+  // 每篇文章的正文都叫 index.md，Obsidian 的文件列表/快速切换器按文件名显示，光看名字找不到东西，
+  // 所以在这里生成一份可点击的索引，放在 blogs/ 下（同样由本脚本维护，不用手改）。
+  const notePath = path.join(BLOGS_DIR, '_文章索引.md')
+  const noteLines = [
+    '# 文章索引',
+    '',
+    '> 由 `scripts/blog-sync.mjs` 自动生成，**不用手改**（改了会在下次构建时被覆盖）。',
+    '> 每篇文章的正文是 `blogs/<目录>/index.md`，文件名不体现标题，所以在这里点进去。',
+    '',
+    ...index
+      .filter(p => !p.hidden)
+      .map(p => {
+        const date = p.date ? `　<small>${String(p.date).slice(0, 10)}</small>` : ''
+        return `- [${p.title}](/blogs/${p.slug}/index.md)${date}`
+      }),
+    ''
+  ]
+  const nextNote = noteLines.join('\n')
+  const prevNote = fs.existsSync(notePath) ? fs.readFileSync(notePath, 'utf8') : null
+  if (prevNote !== nextNote) {
+    fs.writeFileSync(notePath, nextNote)
+    console.log('[blog-sync] 更新 _文章索引.md')
   }
 
   console.log(`[blog-sync] 完成：${index.length} 篇文章，${written} 个 config.json 有变更`)

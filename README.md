@@ -69,6 +69,11 @@ cover: /blogs/arch-niri-setup/cover.webp
 3. 图片直接拖进 Obsidian，它会放到同目录并生成 `/blogs/<slug>/xxx.png` 形式的链接。
 4. 写完提交推送即可。**不需要手动改任何 JSON** —— 构建时会自动跑同步。
 
+> **在 Obsidian 里怎么找到文章？** 每篇正文都叫 `blogs/<slug>/index.md`——文件名不体现标题，
+> Obsidian 的文件列表和快速切换器（Ctrl+O）里全是同一个名字 `index`。两个缓解手段：
+> 1. 每篇 frontmatter 写 `aliases:`（模板里有），Ctrl+O 就能按别名搜到；
+> 2. `blogs/_文章索引.md` 由 `scripts/blog-sync.mjs` 自动生成，列出全部标题并可点击跳转。
+
 ### frontmatter 字段
 
 | 字段 | 必填 | 说明 |

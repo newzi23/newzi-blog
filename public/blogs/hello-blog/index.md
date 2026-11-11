@@ -1,5 +1,8 @@
 ---
 title: 博客开张：Hexo + Butterfly + GitHub Pages
+aliases:
+  - 博客开张
+  - Hexo + Butterfly + GitHub Pages
 date: 2026-11-04T21:10
 tags:
   - Hexo
